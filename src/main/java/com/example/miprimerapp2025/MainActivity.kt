@@ -29,15 +29,18 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-@Preview
+
+
 @Composable
 fun AppContent() {
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
-            painter = painterResource(id = R.drawable.imagebackground),
+            painter = painterResource(id = R.drawable.andy_rubin),
             contentDescription = null,
             contentScale = ContentScale.Crop,
-            modifier = Modifier.align(Alignment.Center)
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
         )
         Column(
             modifier = Modifier
@@ -45,33 +48,68 @@ fun AppContent() {
                 .padding(16.dp),
             verticalArrangement = Arrangement.Center
         ) {
-            var text1 by remember { mutableStateOf(TextFieldValue("")) }
-            var text2 by remember { mutableStateOf(TextFieldValue("")) }
+            var cost by remember { mutableStateOf(TextFieldValue("")) }
+            var discount by remember { mutableStateOf(TextFieldValue("")) }
+            var finalPrice by remember { mutableStateOf("") }
 
             BasicTextField(
-                value = text1,
-                onValueChange = { text1 = it },
+                value = cost,
+                onValueChange = { cost = it },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 16.dp)
-                    .background(Color.White)
+                    .background(Color.White),
+                decorationBox = { innerTextField ->
+                    if (cost.text.isEmpty()) {
+                        Text(text = "Enter product cost", color = Color.Gray)
+                    }
+                    innerTextField()
+                }
             )
 
             BasicTextField(
-                value = text2,
-                onValueChange = { text2 = it },
+                value = discount,
+                onValueChange = { discount = it },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 16.dp)
-                    .background(Color.White)
+                    .background(Color.White),
+                decorationBox = { innerTextField ->
+                    if (discount.text.isEmpty()) {
+                        Text(text = "Enter discount (%)", color = Color.Gray)
+                    }
+                    innerTextField()
+                }
             )
-// estilos
+
             Button(
-                onClick = { /* Handle button click */ },
+                onClick = {
+                    val costValue = cost.text.toDoubleOrNull() ?: 0.0
+                    val discountValue = discount.text.toDoubleOrNull() ?: 0.0
+                    val discountAmount = costValue * (discountValue / 100)
+                    finalPrice = "Final Price: \$${costValue - discountAmount}"
+                },
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
-                Text(text = "Calcular")
+                Text(text = "Calculate")
+            }
+
+            if (finalPrice.isNotEmpty()) {
+                Text(
+                    text = finalPrice,
+                    modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 16.dp),
+                    style = MaterialTheme.typography.bodyLarge
+                )
             }
         }
     }
 }
+
+@Preview
+@Composable
+fun PreviewAppContent() {
+
+        AppContent()
+
+}
+
